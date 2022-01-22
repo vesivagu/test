@@ -1,0 +1,25 @@
+Explain what is Bootstrap Grid System?
+
+For creating page layout through a series of rows and columns that house your content Bootstrap Grid Sytem is used.
+
+
+What is column ordering in Bootstrap?
+
+Column ordering is one of the feature available in bootstrap and you can easily write columns in an order and show them in another one. With .col-md-push-* and .col-md-pull-*
+
+the order of the column can be easily changed.
+
+
+Explain what is Bootstrap Container?
+
+Bootstrap container is a class which is useful and creates a centred area within the page where our site content can be put within. The advantage of the bootstrap 
+.container is that it is responsive and will place all our other HTML code.
+
+EXPERIENCE
+what is Scaffolding: 
+It supports the grid system, styles, and backgrounds of various kinds.
+
+Define types of layout in Bootstrap? Explain?
+Answer: There are two types of layout in Bootstrap include fixed design and fluid layout
+
+Breakpoints used in bootstrap

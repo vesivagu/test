@@ -1,0 +1,87 @@
+ow to define an anonymous function?
+An anonymous function can be defined in a similar way as a normal function but it would not have any name.
+
+Difference between “var” and “let” Keywords?
+Var was there from the beginning but the let was introduced in ES2015/ES6.
+Let has block scope and “Var” has function scope
+
+Difference between “undefine” and “NULL” Keywords?
+When you define a var but not assign any value. typeof(undefine)=> undefine
+Null- manually done. typeof(null)=> object
+
+
+What is SetTimeout()?
+When you setTimeout it becomes asynchronous and it has to wait on the stack to get everything got finished
+
+
+What is ECMAScript?
+Ans. ECMAScript is a scripting language standardized by ECMA International in ECMA-262. Languages like ActionScript, 
+JavaScript, and many more scripting languages are used ECMAScript, among these JavaScript is a well know client-side scripting language and an implementation of ECMAScript, 
+since the standard was published. The latest version is ECMAScript6.
+
+What are the data types supported by JavaScript?
+Ans. JavaScript variables are dynamically typed, which means there is a data type but it will not bound to a particular type, example while initializing the variable it can be string type but later It can also assign to a numeric value.
+
+The data types supported by JavaScript are:
+
+Undefined
+
+Null
+
+Boolean
+
+Object
+
+String
+
+Symbol
+
+Number
+
+
+What is strict mode?
+Ans. “use strict” is not a statement but a literal expression which is supported by ECMAScript version 5. This statement instruct browser to use the strict mode, which is a safer future in JavaScript. It will eliminate some JavaScript silent errors.
+
+Example
+
+"use strict";
+ x = 10; // this will give error
+The above statement will give an error because in strict mode the variable should be declared before it is used.
+
+The “use strict” expression can be in global scope as well as local scope
+
+Global scope
+
+const employee = { name: "Ram", age: 25 }
+employee.name = "Raju" // it is possible 
+use strict";
+x = 10; // this will give error
+local scope
+
+x = 10; // This will not give error. 
+myFunction();
+function myFunction() {
+ "use strict";
+ y = 15; // This will give error
+ 
+ 
+ What is the arrow function?
+Ans. The arrow function will support in JavaScript only after ES6 or above, it is a short way to write function expression. The conventional way of writing a function
+
+function add(a, b) {
+ return a + b;
+ }
+console.log(add(1, 2));//3
+
+FRESHER
+What is DOM?
+Ans. DOM is a W3C (World wide web consortium) standard, when the HTML page loads in the browser, the browser creates the DOM (Document object model). 
+It defines the HTML element as an object and allows scripts to dynamically manipulate the content, and the structure of the document.
+
+
+What are the various types of errors in JavaScript?
+Ans. Here are the 3 types of errors in JavaScript:
+
+Runtime errors: These are the errors that occur due to misuse of the command within the HTML language.
+Load time errors: These errors occur while loading a web page. An example includes improper syntax errors that produce the errors dynamically.
+Logical Errors: These errors come up because of the bad logic carried out on a function with a varied operation.

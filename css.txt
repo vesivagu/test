@@ -1,0 +1,51 @@
+Give a few examples of modules found in the present version of CSS.
+Answer: Some of the commonly used modules in CSS include:
+
+Box Model
+Selectors
+Text effects
+Backgrounds and Borders
+Animations
+2D/3D Transformations
+User Interface.
+Multiple Column Layout
+
+
+Name a few CSS style components
+Answer: A few CSS style components include Property, Value, and Selector
+
+
+FRESHER
+What are the ways to integrate / i mean include CSS as a web page?
+
+There are three methods to integrate CSS in the form of a web page:
+
+Embedded: There can be a style element inside the head element inside which we can place the code.
+Inline: CSS applied HTML elements can be found using style attributes.
+Imported or Linked: In the case of linked or imported CSS, the CSS is placed in an external file and a link element is used to link it.
+
+
+What are the media types allowed by CSS?
+Answer: CSS allows different media types such as speech, audio, visual and tactile media, paged or continuous media, bitmap or grid media, and even interactive media.
+
+Is it possible to add multiple declarations in CSS?
+Answer: Yes, we can do this with the help of semicolons.
+
+What is meant by a universal selector?
+Answer: It is a selector which can match the name of any element type, rather than selecting the elements of a specific category.
+
+What is the difference between visibility: hidden and display:none?
+Answer: The difference between visibility:hidden and display:none properties is that in the case of the former, the elements are hidden but not deleted. No space is consumed.
+
+can v give negative value for margin and padding?
+postion prop
+
+EXPERIENCE
+
+What is Pseudo-elements ?
+
+Pseudo-elements are used to add special effects to some selectors.  CSS in used to apply styles in HTML mark-up. In some cases when extra mark-up or styling is not possible for the document, then there is a feature available in CSS known as pseudo-elements. 
+It will allow extra mark-up to the document without disturbing the actual document.
+
+What is at-rule?
+Rule, which is applicable in the entire sheet and not partly, is known as at-rule. It is preceded by @ followed by A-Z, a-z or 0-9.

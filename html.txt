@@ -1,0 +1,90 @@
+2. What is an API and list the API's available in HTML5?
+API (Application Programming Interfaces) in HTML5 is a way to build different applications using pre-built components. Developers can integrate the relevant features of existing APIs into their new websites.
+
+The APIs in HTML5 are:
+HTML Web Workers
+HTML Drag and Drop
+HTML Application Cache
+HTML Local Storage
+HTML SSE
+HTML Geolocation
+
+Name few new Structural Elements in HTML5?
+HTML5 has introduced the following structural elements for defining different parts of a web page:
+
+<header>: Represents HTML's header data
+<footer>: Footer of the page
+<nav>: Represents page's navigation elements
+<article>: Content that is self-contained
+<section>: Defines sections or groups content into sections
+<aside>: Refers to side bar contents
+
+
+
+
+7. How do you optimize a website's assets & reduce page load time?
+Follow these steps to optimize assets and also reduce the page load time of any website:
+
+Properly naming all assets.
+Using a content delivery network (CDN) for media files.
+Hosting assets on different domains while also reducing DNS lookups
+Using a cookie-free domain to place assets and splitting them among domains
+Using CSS Sprites for Images.
+Disabling etags.
+Minimizing the use of JS in code.
+Minimizing inline CSS and using internal and external style sheets.
+
+
+12. What are the different types of storage in html5? Explain
+In HTML5, data can be stored in 2 ways – session storage and local storage.
+
+Session Storage: The data or details from the current browsing session are stored. Once the browser gets closer by the user, the storage data gets removed.
+Local Storage: The data does not get cleared automatically when the user closes the browser.
+
+11. What is local storage in HTML5? How it is used?
+HTML5 has introduced the concept of Local Storage, which is used to access a web page's local storage area without any time limit. Local storage is available whenever the user wants to use the web page.
+
+The data stored in Local Storage does not get automatically deleted when the browser window is closed; it only gets removed when deleted manually. In local storage, the data is stored using a key and value.
+
+16. What is the application cache in HTML5 and why it is used?
+The application cache is a feature in HTML 5 which is used to store website data inside a cached version, 
+thus allowing accessibility without net connectivity. It is very useful for desktop-based web applications requiring to store data on local systems.
+
+
+
+
+The new input types are:
+
+Time
+Date
+Datetime
+Datetime-local
+Week
+Month
+Email
+Color
+Number
+Range
+Search
+Telephone
+URL
+
+FRESHER
+36. What is <iframe> and why we can use this?
+The <iframe> tag is used to indicate an inline frame, or, a browsing context that is nested. It allows outside documents to be inserted in the main HTML document seamlessly.
+ Inline frames are mostly used in online advertising, where the contents of the iframe can e an ad from a third party.
+ 
+ EXPERIENCE
+ 43. What are the new attributes of form tag in HTML5?
+Here is a list of the new form attributes introduced in HTML 5
+
+novalidate
+autocomplete
+
+
+Websockets in html5?
+Websockets and SSE (Server-Sent Events) are each successful of pushing records to browsers, however, they are no longer competing for technologies.
+Websockets connections can both ship statistics to the browser and acquire information from the browser. A true example of an application that ought to use WebSockets is a chat application.
+SSE connections can solely push statistics to the browser. Online inventory prices or twitters updating timeline or feed are excellent examples of a utility that ought to benefit from SSE.
+In exercise considering the fact that the whole lot that can be executed with SSE can also be executed with Websockets, 
+Websockets is getting a lot greater attention and love, and many more browsers help Websockets than SSE.
