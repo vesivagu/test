@@ -1,58 +1,41 @@
-<div class="drop-zone" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
-  <p>Drag and drop XML files here</p>
-</div>
+<input type="text" [(ngModel)]="xmlUrl" placeholder="Enter XML URL" />
+<button (click)="readXmlFromUrl(xmlUrl)">Read XML</button>
+
 
 import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
-  selector: 'app-file-upload',
-  templateUrl: './file-upload.component.html',
-  styleUrls: ['./file-upload.component.css']
+  selector: 'app-file-reader',
+  templateUrl: './file-reader.component.html',
+  styleUrls: ['./file-reader.component.css']
 })
-export class FileUploadComponent {
+export class FileReaderComponent {
+  constructor(private http: HttpClient) { }
 
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
-  }
-
-  onDragLeave(event: DragEvent) {
-    event.preventDefault();
-  }
-
-  onDrop(event: DragEvent) {
-    event.preventDefault();
-    const files = event.dataTransfer?.files;
-    if (files && files.length > 0) {
-      this.handleFiles(files);
-    }
-  }
-
-  handleFiles(files: FileList) {
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      if (file.type === 'text/xml') {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const contents = e.target?.result as string;
-          // Process the XML contents
-          console.log(contents);
-        };
-        reader.readAsText(file);
-      } else {
-        console.log('Invalid file type. Please drop an XML file.');
-      }
-    }
+  readXmlFromUrl(url: string) {
+    this.http.get(url, { responseType: 'text' })
+      .subscribe(
+        (xmlContent: string) => {
+          // Process the XML content here
+          console.log(xmlContent);
+        },
+        (error) => {
+          console.error('Error reading XML file:', error);
+        }
+      );
   }
 }
 
 
-.drop-zone {
-  border: 2px dashed #ccc;
-  border-radius: 5px;
-  width: 300px;
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
+
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FileReaderComponent } from './file-reader.component';
+
+@NgModule({
+  declarations: [FileReaderComponent],
+  imports: [CommonModule, FormsModule],
+})
+export class FileReaderModule { }
