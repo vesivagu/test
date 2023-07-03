@@ -1,41 +1,61 @@
-<input type="text" [(ngModel)]="xmlUrl" placeholder="Enter XML URL" />
-<button (click)="readXmlFromUrl(xmlUrl)">Read XML</button>
-
-
-import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
-@Component({
-  selector: 'app-file-reader',
-  templateUrl: './file-reader.component.html',
-  styleUrls: ['./file-reader.component.css']
-})
-export class FileReaderComponent {
-  constructor(private http: HttpClient) { }
-
-  readXmlFromUrl(url: string) {
-    this.http.get(url, { responseType: 'text' })
-      .subscribe(
-        (xmlContent: string) => {
-          // Process the XML content here
-          console.log(xmlContent);
-        },
-        (error) => {
-          console.error('Error reading XML file:', error);
+function convertObjectToTable(obj) {
+  // Create the table element
+  var table = document.createElement('table');
+  
+  // Recursive function to generate table rows
+  function createRows(data, parent) {
+    for (var key in data) {
+      if (data.hasOwnProperty(key)) {
+        var value = data[key];
+        
+        // Create a new row
+        var row = document.createElement('tr');
+        parent.appendChild(row);
+        
+        // Create cell for the key
+        var keyCell = document.createElement('td');
+        keyCell.textContent = key;
+        row.appendChild(keyCell);
+        
+        // Create cell for the value
+        var valueCell = document.createElement('td');
+        row.appendChild(valueCell);
+        
+        // Check if the value is an object (nested structure)
+        if (typeof value === 'object' && value !== null) {
+          // Create a new table inside the value cell
+          var nestedTable = document.createElement('table');
+          valueCell.appendChild(nestedTable);
+          
+          // Recursively create rows for the nested object
+          createRows(value, nestedTable);
+        } else {
+          // Otherwise, simply set the value as text content
+          valueCell.textContent = value;
         }
-      );
+      }
+    }
   }
+  
+  // Start the recursive function to create table rows
+  createRows(obj, table);
+  
+  return table;
 }
 
+// Example usage:
+var data = {
+  name: 'John',
+  age: 30,
+  address: {
+    street: '123 Main St',
+    city: 'New York',
+    country: 'USA'
+  },
+  hobbies: ['reading', 'running', 'cooking']
+};
 
+var tableElement = convertObjectToTable(data);
 
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { FileReaderComponent } from './file-reader.component';
-
-@NgModule({
-  declarations: [FileReaderComponent],
-  imports: [CommonModule, FormsModule],
-})
-export class FileReaderModule { }
+// Add the generated table to the DOM
+document.body.appendChild(tableElement);
