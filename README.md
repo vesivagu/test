@@ -1,70 +1,46 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Print Selected Rows to PDF</title>
+    <title>Upload Multiple XML Files</title>
 </head>
 <body>
-    <table id="data-table">
-        <!-- Your table headers -->
-        <tr>
-            <th>Select</th>
-            <th>Column 1</th>
-            <th>Column 2</th>
-            <!-- Add more column headers as needed -->
-        </tr>
-        <!-- Your table rows and data go here -->
-        <tr>
-            <td><input type="checkbox"></td>
-            <td>Data 1</td>
-            <td>Data 2</td>
-            <!-- Add more data cells as needed -->
-        </tr>
-        <!-- Add more rows as needed -->
-    </table>
-    <button id="print-pdf">Print Selected Rows to PDF</button>
+    <h1>Upload XML Files</h1>
+    <input type="file" id="fileInput" multiple>
+    <button onclick="handleFiles()">Upload and Process</button>
+    <div id="output"></div>
 
-    <!-- Include JavaScript libraries -->
-    <!-- For example, you can use jsPDF to create a PDF on the client-side -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <script src="your-custom-script.js"></script>
+    <script>
+        function handleFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
+
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '';
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (file.type === 'text/xml') {
+                    const reader = new FileReader();
+
+                    reader.onload = function(event) {
+                        const xmlString = event.target.result;
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+
+                        // Process the XML content as needed
+                        const elements = xmlDoc.getElementsByTagName('your_tag_name'); // Replace "your_tag_name" with the tag you want to extract data from
+                        for (let j = 0; j < elements.length; j++) {
+                            const content = elements[j].textContent;
+                            outputDiv.innerHTML += '<p>' + content + '</p>';
+                        }
+                    };
+
+                    reader.readAsText(file);
+                } else {
+                    outputDiv.innerHTML += '<p>File ' + file.name + ' is not a valid XML file.</p>';
+                }
+            }
+        }
+    </script>
 </body>
 </html>
-
-
-
-
-// Wait for the document to be fully loaded
-document.addEventListener("DOMContentLoaded", function () {
-  // Get the table element
-  const table = document.getElementById("data-table");
-
-  // Get the button to print the PDF
-  const printButton = document.getElementById("print-pdf");
-
-  // Function to generate PDF from selected rows
-  function generatePDF() {
-    // Create a new jsPDF instance
-    const doc = new jsPDF();
-
-    // Set the initial y-position for content
-    let y = 20;
-
-    // Loop through the table rows
-    for (let i = 1; i < table.rows.length; i++) {
-      // Check if the checkbox is checked
-      if (table.rows[i].cells[0].querySelector("input").checked) {
-        // Get the row data and add it to the PDF
-        const rowData = Array.from(table.rows[i].cells).map((cell) => cell.innerText);
-        doc.text(20, y, rowData.join(", "));
-        y += 10;
-      }
-    }
-
-    // Save the PDF
-    doc.save("selected_rows.pdf");
-  }
-
-  // Attach click event to the "Print PDF" button
-  printButton.addEventListener("click", generatePDF);
-});
-
