@@ -1,46 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Upload Multiple XML Files</title>
-</head>
-<body>
-    <h1>Upload XML Files</h1>
-    <input type="file" id="fileInput" multiple>
-    <button onclick="handleFiles()">Upload and Process</button>
-    <div id="output"></div>
+// Sample Swift MT message (MT103)
+const swiftMessage = `
+    {1:F01YOURBANKAXXX0000000000}{2:I103BANKBICXXXXXN}{4:
+    :20:REFERENCE_NUMBER
+    :23B:CRED
+    :32A:210101USD1234567,89
+    :50K:/1234567890
+    YOUR CUSTOMER NAME
+    ADDRESS LINE 1
+    ADDRESS LINE 2
+    :59:/9876543210
+    RECEIVER NAME
+    RECEIVER ADDRESS LINE 1
+    RECEIVER ADDRESS LINE 2
+    -}
+`;
 
-    <script>
-        function handleFiles() {
-            const fileInput = document.getElementById('fileInput');
-            const files = fileInput.files;
+// Custom parsing function (simplified)
+function parseSwiftMT103(swiftMessage) {
+    const parsedData = {
+        sender: swiftMessage.match(/:50K:(.*?)\n/)[1],
+        receiver: swiftMessage.match(/:59:(.*?)\n/)[1],
+        reference: swiftMessage.match(/:20:(.*?)\n/)[1],
+        // Add more fields as needed
+    };
+    return parsedData;
+}
 
-            const outputDiv = document.getElementById('output');
-            outputDiv.innerHTML = '';
+// Parse the Swift MT message
+const parsedData = parseSwiftMT103(swiftMessage);
 
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                if (file.type === 'text/xml') {
-                    const reader = new FileReader();
-
-                    reader.onload = function(event) {
-                        const xmlString = event.target.result;
-                        const parser = new DOMParser();
-                        const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
-
-                        // Process the XML content as needed
-                        const elements = xmlDoc.getElementsByTagName('your_tag_name'); // Replace "your_tag_name" with the tag you want to extract data from
-                        for (let j = 0; j < elements.length; j++) {
-                            const content = elements[j].textContent;
-                            outputDiv.innerHTML += '<p>' + content + '</p>';
-                        }
-                    };
-
-                    reader.readAsText(file);
-                } else {
-                    outputDiv.innerHTML += '<p>File ' + file.name + ' is not a valid XML file.</p>';
-                }
-            }
-        }
-    </script>
-</body>
-</html>
+// Output the parsed data
+console.log(parsedData);
