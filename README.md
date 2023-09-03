@@ -1,15 +1,13 @@
-// Sample Swift MT message
-const swiftMTMessage = "{1:F01YOURBANKAXXX0000000000}{2:O1031234150923YOURBANKAXXX00000000001509231509N}";
+const mtMessage = "{1:F01YOURBANKAXXX0000000000}{2:I123BANKCDEFGHXXXXN}{3:{108:123456}{121:abcdef}}";
 
-// Tokenize the message by curly braces
-const tokens = swiftMTMessage.split(/({\d+:)|(:\d+})/).filter(Boolean);
+// Example: Parse the Sender's BIC
+const senderBIC = mtMessage.match(/\{1:(.*?)\}/)[1];
+console.log("Sender BIC:", senderBIC);
 
-// Parse the tokens
-const parsedMessage = {};
-for (let i = 0; i < tokens.length; i += 2) {
-  const fieldTag = tokens[i];
-  const fieldValue = tokens[i + 1];
-  parsedMessage[fieldTag] = fieldValue;
-}
+// Example: Parse the Message Type
+const messageType = mtMessage.match(/\{2:(.*?)\}/)[1];
+console.log("Message Type:", messageType);
 
-console.log(parsedMessage);
+// Example: Parse a specific field (e.g., Field 108)
+const field108 = mtMessage.match(/\{108:(.*?)\}/)[1];
+console.log("Field 108:", field108);
