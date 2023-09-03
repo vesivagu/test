@@ -1,27 +1,43 @@
-const swiftMessage = "{1:F01YOURBANKXAXXX1234567890}{2:I123BANKUS33XXXXN}{3:{108:1234567890123456}}{4:\n:20:123456789\n:32A:220801USD1234567,89\n-}";
+// Sample Swift MT message
+const swiftMessage = `
+{1:F01YOURBANKXAXXX0000000000}{2:I123YOURBANKXXXXN}{4:
+:20:1234567890
+:32A:220102USD1234567,89
+:50K:/12345678901234567890
+FOO BANK
+123 MAIN STREET
+NEW YORK, NY 10001
+:59:/98765432109876543210
+BAR BANK
+456 PARK AVENUE
+LOS ANGELES, CA 90001
+-}{5:{CHK:ABC1234567890}}`;
 
-// Define regular expressions for specific fields you want to extract
-const field1Regex = /{1:([^}]+)}/;
-const field2Regex = /{2:([^}]+)}/;
-const field20Regex = /:20:(\d+)/;
-const field32ARegex = /:32A:([A-Z]{6}\d{6}[A-Z]{3}\d+,\d+)/;
+// Define regex patterns for each field you want to extract
+const regexPatterns = {
+  sender: /{1:F01([^}]*)}/,
+  receiver: /{2:([^}]*)}/,
+  reference: /:20:([^:\n]*)/,
+  amount: /:32A:([^:\n]*)/,
+  beneficiary: /:50K:([^:\n]*)/,
+  originator: /:59:([^:\n]*)/,
+};
 
-// Extract fields from the Swift message
-const field1Match = swiftMessage.match(field1Regex);
-const field2Match = swiftMessage.match(field2Regex);
-const field20Match = swiftMessage.match(field20Regex);
-const field32AMatch = swiftMessage.match(field32ARegex);
+// Function to extract Swift MT message fields
+function extractSwiftFields(message, patterns) {
+  const result = {};
+  for (const field in patterns) {
+    const regex = patterns[field];
+    const match = message.match(regex);
+    if (match) {
+      result[field] = match[1].trim();
+    }
+  }
+  return result;
+}
 
-// Print extracted values
-if (field1Match) {
-  console.log("Field 1:", field1Match[1]);
-}
-if (field2Match) {
-  console.log("Field 2:", field2Match[1]);
-}
-if (field20Match) {
-  console.log("Field 20:", field20Match[1]);
-}
-if (field32AMatch) {
-  console.log("Field 32A:", field32AMatch[1]);
-}
+// Extract fields from the sample message
+const extractedFields = extractSwiftFields(swiftMessage, regexPatterns);
+
+// Output the extracted fields
+console.log(extractedFields);
