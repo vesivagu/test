@@ -1,43 +1,23 @@
 // Sample Swift MT message
-const swiftMessage = `
-{1:F01YOURBANKXAXXX0000000000}{2:I123YOURBANKXXXXN}{4:
-:20:1234567890
-:32A:220102USD1234567,89
-:50K:/12345678901234567890
-FOO BANK
-123 MAIN STREET
-NEW YORK, NY 10001
-:59:/98765432109876543210
-BAR BANK
-456 PARK AVENUE
-LOS ANGELES, CA 90001
--}{5:{CHK:ABC1234567890}}`;
+const swiftMTMessage = "{1:F01YOURBANKXAXXX0000000000}{2:O1031234170906YOURBANKXXXX00000000001709060934N}{3:{103:TGT}{108:1234567890123456}}";
 
-// Define regex patterns for each field you want to extract
-const regexPatterns = {
-  sender: /{1:F01([^}]*)}/,
-  receiver: /{2:([^}]*)}/,
-  reference: /:20:([^:\n]*)/,
-  amount: /:32A:([^:\n]*)/,
-  beneficiary: /:50K:([^:\n]*)/,
-  originator: /:59:([^:\n]*)/,
-};
+// Define the field codes you want to extract
+const fieldCodes = ["20", "32A", "58A"];
 
-// Function to extract Swift MT message fields
-function extractSwiftFields(message, patterns) {
-  const result = {};
-  for (const field in patterns) {
-    const regex = patterns[field];
-    const match = message.match(regex);
+// Function to extract fields from the message
+function extractFields(message, fieldCodes) {
+  const extractedFields = {};
+
+  for (const code of fieldCodes) {
+    const regex = new RegExp(`{${code}:([^{}]+)}`);
+    const match = regex.exec(message);
     if (match) {
-      result[field] = match[1].trim();
+      extractedFields[code] = match[1];
     }
   }
-  return result;
+
+  return extractedFields;
 }
 
-// Extract fields from the sample message
-const extractedFields = extractSwiftFields(swiftMessage, regexPatterns);
-
-// Output the extracted fields
-console.log(extractedFields);
+const extractedData = extractFields(swiftMTMessage, fieldCodes);
+console.log(extractedData);
