@@ -1,23 +1,22 @@
 // Sample Swift MT message
-const swiftMTMessage = "{1:F01YOURBANKXAXXX0000000000}{2:O1031234170906YOURBANKXXXX00000000001709060934N}{3:{103:TGT}{108:1234567890123456}}";
+var swiftMessage = "{1:F01BANKUS33AXXX1234567890}{2:O1031609050901BANKUS33AXXX12345678900509010501N}{4:\n:20:REFERENCE\n:32A:210901USD12345,67\n-}";
 
-// Define the field codes you want to extract
-const fieldCodes = ["20", "32A", "58A"];
-
-// Function to extract fields from the message
-function extractFields(message, fieldCodes) {
-  const extractedFields = {};
-
-  for (const code of fieldCodes) {
-    const regex = new RegExp(`{${code}:([^{}]+)}`);
-    const match = regex.exec(message);
-    if (match) {
-      extractedFields[code] = match[1];
+// Function to extract a specific field by its field tag
+function extractField(message, fieldTag) {
+    var tagStart = message.indexOf(":" + fieldTag + ":");
+    if (tagStart !== -1) {
+        var tagEnd = message.indexOf("\n", tagStart);
+        if (tagEnd !== -1) {
+            return message.substring(tagStart + fieldTag.length + 2, tagEnd);
+        }
     }
-  }
-
-  return extractedFields;
+    return null;
 }
 
-const extractedData = extractFields(swiftMTMessage, fieldCodes);
-console.log(extractedData);
+// Extract the 20 (Reference) field
+var referenceField = extractField(swiftMessage, "20");
+console.log("Reference Field: " + referenceField);
+
+// Extract the 32A (Amount) field
+var amountField = extractField(swiftMessage, "32A");
+console.log("Amount Field: " + amountField);
