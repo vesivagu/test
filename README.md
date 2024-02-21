@@ -1,22 +1,23 @@
-// Sample Swift MT message
-var swiftMessage = "{1:F01BANKUS33AXXX1234567890}{2:O1031609050901BANKUS33AXXX12345678900509010501N}{4:\n:20:REFERENCE\n:32A:210901USD12345,67\n-}";
+import { Rule, SchematicContext, Tree, chain, template, url } from '@angular-devkit/schematics';
 
-// Function to extract a specific field by its field tag
-function extractField(message, fieldTag) {
-    var tagStart = message.indexOf(":" + fieldTag + ":");
-    if (tagStart !== -1) {
-        var tagEnd = message.indexOf("\n", tagStart);
-        if (tagEnd !== -1) {
-            return message.substring(tagStart + fieldTag.length + 2, tagEnd);
-        }
-    }
-    return null;
+export function addCssClass(options: any): Rule {
+  return (tree: Tree, _context: SchematicContext) => {
+    return chain([
+      updateHtmlFiles(options)
+    ])(tree, _context);
+  };
 }
 
-// Extract the 20 (Reference) field
-var referenceField = extractField(swiftMessage, "20");
-console.log("Reference Field: " + referenceField);
-
-// Extract the 32A (Amount) field
-var amountField = extractField(swiftMessage, "32A");
-console.log("Amount Field: " + amountField);
+function updateHtmlFiles(options: any): Rule {
+  return (tree: Tree, _context: SchematicContext) => {
+    tree.getDir('/src/app').visit((filePath) => {
+      if (filePath.endsWith('.html')) {
+        let content = tree.read(filePath)!.toString('utf-8');
+        // Modify content to add the CSS class
+        content = content.replace('<div', '<div class="your-css-class"');
+        tree.overwrite(filePath, content);
+      }
+    });
+    return tree;
+  };
+}
