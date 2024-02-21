@@ -1,23 +1,35 @@
-import { Rule, SchematicContext, Tree, chain, template, url } from '@angular-devkit/schematics';
+import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
+import { Schema as MySchematicSchema } from './schema';
+import { Schematics } from '@angular-devkit/schematics/tools';
 
-export function addCssClass(options: any): Rule {
+export function mySchematic(options: MySchematicSchema): Rule {
   return (tree: Tree, _context: SchematicContext) => {
-    return chain([
-      updateHtmlFiles(options)
-    ])(tree, _context);
-  };
-}
+    const workspaceConfigBuffer = tree.read('angular.json');
+    if (!workspaceConfigBuffer) {
+      throw new SchematicsException('Not an Angular CLI workspace');
+    }
 
-function updateHtmlFiles(options: any): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
-    tree.getDir('/src/app').visit((filePath) => {
-      if (filePath.endsWith('.html')) {
-        let content = tree.read(filePath)!.toString('utf-8');
-        // Modify content to add the CSS class
-        content = content.replace('<div', '<div class="your-css-class"');
-        tree.overwrite(filePath, content);
+    const workspaceConfig = JSON.parse(workspaceConfigBuffer.toString());
+    const projectName = options.project || workspaceConfig.defaultProject;
+
+    // Prompting user for input
+    const prompts: Schematics.PromptQuestionCollection = [
+      {
+        type: 'input',
+        name: 'name',
+        message: 'What is your name?'
       }
+    ];
+
+    return Schematics.prompt(prompts, (answers) => {
+      // Use the user's input here
+      const { name } = answers;
+      _context.logger.info(`Hello, ${name}!`);
+
+      // Perform other schematic tasks using the user's input
+      // For example, generating files, modifying configuration, etc.
+
+      return tree;
     });
-    return tree;
   };
 }
