@@ -1,30 +1,32 @@
-import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
-import { parse as parseHtml, serialize } from 'parse5';
+import { Rule, Tree, SchematicContext, SchematicsException, apply, url, template, mergeWith } from '@angular-devkit/schematics';
+import { strings } from '@angular-devkit/core';
 
 export function addCssClass(options: any): Rule {
   return (tree: Tree, _context: SchematicContext) => {
-    tree.visit((filePath) => {
-      if (filePath.endsWith('.html')) {
-        let content = tree.read(filePath)?.toString('utf-8');
-        if (content) {
-          const document = parseHtml(content);
-          // Implement logic to traverse the HTML document, identify specific input elements, and add the CSS class
-          // For example:
-          document.childNodes.forEach((node) => {
-            if (node.nodeName === 'input') {
-              // Check if this input matches your criteria and add the CSS class
-              // For example:
-              node.attrs.push({ name: 'class', value: options.className });
-            }
-          });
+    // Logic to modify HTML files
+    // Example: find all <input> elements with a specific attribute and add a class
+    const projectDir = '/path/to/your/angular/app';
+    const htmlFiles = tree.getDir(projectDir).visit((filePath) => filePath.endsWith('.html'));
 
-          // Serialize the updated document back to HTML
-          const updatedContent = serialize(document);
-          tree.overwrite(filePath, updatedContent);
-        }
-      }
+    htmlFiles.forEach((htmlFile) => {
+      const content = tree.read(htmlFile)!.toString('utf-8');
+      // Use a library like `cheerio` to parse HTML and manipulate DOM elements
+      // Example:
+      // const $ = cheerio.load(content);
+      // $('input[data-special]').addClass('special-class');
+      // tree.overwrite(htmlFile, $.html());
     });
 
     return tree;
+  };
+}
+
+export function mySchematic(options: any): Rule {
+  return (_tree: Tree, _context: SchematicContext) => {
+    // Apply changes to HTML files
+    return mergeWith(apply(url('./files'), [
+      template({...options, ...strings}),
+      addCssClass(options)
+    ]));
   };
 }
