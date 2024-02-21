@@ -1,32 +1,37 @@
-import { Rule, Tree, SchematicContext, SchematicsException, apply, url, template, mergeWith } from '@angular-devkit/schematics';
-import { strings } from '@angular-devkit/core';
+import { Rule, SchematicContext, Tree, chain, apply, url, forEach, MergeStrategy, MergeWithConflictResolution } from '@angular-devkit/schematics';
+import { parse as parseHtml, HTMLElement } from 'node-html-parser';
 
-export function addCssClass(options: any): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
-    // Logic to modify HTML files
-    // Example: find all <input> elements with a specific attribute and add a class
-    const projectDir = '/path/to/your/angular/app';
-    const htmlFiles = tree.getDir(projectDir).visit((filePath) => filePath.endsWith('.html'));
-
-    htmlFiles.forEach((htmlFile) => {
-      const content = tree.read(htmlFile)!.toString('utf-8');
-      // Use a library like `cheerio` to parse HTML and manipulate DOM elements
-      // Example:
-      // const $ = cheerio.load(content);
-      // $('input[data-special]').addClass('special-class');
-      // tree.overwrite(htmlFile, $.html());
-    });
-
-    return tree;
+export default function (options: any): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    return chain([
+      addCssClass(options),
+    ])(tree, context);
   };
 }
 
-export function mySchematic(options: any): Rule {
-  return (_tree: Tree, _context: SchematicContext) => {
-    // Apply changes to HTML files
-    return mergeWith(apply(url('./files'), [
-      template({...options, ...strings}),
-      addCssClass(options)
-    ]));
+function addCssClass(options: any): Rule {
+  return (tree: Tree, context: SchematicContext) => {
+    return forEach((fileEntry) => {
+      if (fileEntry.path.endsWith('.html') || fileEntry.path.endsWith('.css')) {
+        const content = fileEntry.content.toString('utf-8');
+
+        if (fileEntry.path.endsWith('.html')) {
+          const parsedHtml = parseHtml(content);
+          // Find elements in HTML and add CSS class
+          parsedHtml.querySelectorAll(options.selector).forEach((element: HTMLElement) => {
+            if (!element.classNames.includes(options.className)) {
+              element.classNames.add(options.className);
+            }
+          });
+          tree.overwrite(fileEntry.path, parsedHtml.toString());
+        }
+
+        if (fileEntry.path.endsWith('.css')) {
+          // Add CSS rule for the specified class
+          const newCssRule = `.${options.className} { /* Your CSS styles here */ }`;
+          tree.create(fileEntry.path, content + '\n\n' + newCssRule);
+        }
+      }
+    });
   };
 }
