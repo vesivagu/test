@@ -3,34 +3,38 @@ import {
   SchematicContext,
   Tree,
   apply,
-  chain,
-  mergeWith,
+  url,
   template,
-  url
+  mergeWith,
+  chain,
 } from '@angular-devkit/schematics';
-import { strings } from '@angular-devkit/core';
+import { Schema } from './schema';
 
-export function addCssClass(options: any): Rule {
+export function addCssClass(options: Schema): Rule {
   return (tree: Tree, _context: SchematicContext) => {
-    const projectDir = '/path/to/your/angular/app';
-    const htmlFiles = tree.getDir(projectDir).visit((filePath) => filePath.endsWith('.html'));
+    return chain([
+      addClassToHtmlFiles(options),
+      addClassToComponentFiles(options),
+    ])(tree, _context);
+  };
+}
 
-    htmlFiles.forEach((htmlFile) => {
-      const content = tree.read(htmlFile)!.toString('utf-8');
-      const updatedContent = content.replace('<input', '<input class="' + options.className + '"');
-
-      tree.overwrite(htmlFile, updatedContent);
-    });
-
+function addClassToHtmlFiles(options: Schema): Rule {
+  return (tree: Tree, _context: SchematicContext) => {
+    // Logic to find and modify HTML files
     return tree;
   };
 }
 
-export function mySchematic(options: any): Rule {
-  return (_tree: Tree, _context: SchematicContext) => {
-    return chain([
-      mergeWith(apply(url('./files'), [template({...options, ...strings})])),
-      addCssClass(options)
-    ]);
+function addClassToComponentFiles(options: Schema): Rule {
+  return (tree: Tree, _context: SchematicContext) => {
+    // Logic to find and modify component files
+    return tree;
+  };
+}
+
+export default function (options: Schema): Rule {
+  return (tree: Tree, _context: SchematicContext) => {
+    return chain([addCssClass(options)])(tree, _context);
   };
 }
