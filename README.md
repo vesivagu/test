@@ -1,40 +1,31 @@
-import {
-  Rule,
-  SchematicContext,
-  Tree,
-  apply,
-  url,
-  template,
-  mergeWith,
-  chain,
-} from '@angular-devkit/schematics';
-import { Schema } from './schema';
+import { Rule, SchematicContext, Tree, apply, chain, url, mergeWith } from '@angular-devkit/schematics';
+import { parse as parseJson } from 'jsonc-parser';
 
-export function addCssClass(options: Schema): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
-    return chain([
-      addClassToHtmlFiles(options),
-      addClassToComponentFiles(options),
-    ])(tree, _context);
-  };
+// Define options interface
+export interface AddCssClassOptions {
+  className: string;
 }
 
-function addClassToHtmlFiles(options: Schema): Rule {
+// Add CSS class rule to component template
+function addCssClass(options: AddCssClassOptions): Rule {
   return (tree: Tree, _context: SchematicContext) => {
-    // Logic to find and modify HTML files
+    tree.visit((filePath) => {
+      if (filePath.endsWith('.component.html')) {
+        const fileContent = tree.read(filePath)?.toString('utf-8');
+        if (fileContent) {
+          const updatedContent = fileContent.replace('</div>', `<div class="${options.className}"></div>`);
+          tree.overwrite(filePath, updatedContent);
+        }
+      }
+    });
     return tree;
   };
 }
 
-function addClassToComponentFiles(options: Schema): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
-    // Logic to find and modify component files
-    return tree;
-  };
-}
-
-export default function (options: Schema): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
-    return chain([addCssClass(options)])(tree, _context);
-  };
+// Main schematic function
+export function addCssClassSchematic(options: AddCssClassOptions): Rule {
+  return chain([
+    addCssClass(options),
+    mergeWith(url('./files')),
+  ]);
 }
