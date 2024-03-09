@@ -1,41 +1,29 @@
-import { Rule, SchematicContext, Tree, apply, mergeWith, url } from '@angular-devkit/schematics';
-import { strings } from '@angular-devkit/core';
+const cheerio = require('cheerio');
 
-export function checkAttributes(options: any): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
-    // Read the JSON file
-    const jsonFileContent = tree.read(options.jsonFilePath);
-    if (!jsonFileContent) {
-      throw new Error(`JSON file '${options.jsonFilePath}' not found.`);
-    }
+// Sample HTML content
+const htmlContent = `
+<div>
+  <div>
+    <p class="paragraph">This is a paragraph.</p>
+  </div>
+  <div>
+    <p>This is another paragraph.</p>
+  </div>
+</div>
+`;
 
-    const jsonContent = JSON.parse(jsonFileContent.toString());
+// Load HTML content using cheerio
+const $ = cheerio.load(htmlContent);
 
-    // Traverse through the Angular app files
-    tree.visit((filePath) => {
-      if (filePath.endsWith('.ts') || filePath.endsWith('.html')) {
-        const fileContent = tree.read(filePath)?.toString('utf-8');
-        if (fileContent) {
-          Object.keys(jsonContent).forEach((attribute) => {
-            if (fileContent.includes(attribute)) {
-              _context.logger.info(`Attribute '${attribute}' found in file '${filePath}'.`);
-            } else {
-              _context.logger.warn(`Attribute '${attribute}' not found in file '${filePath}'.`);
-            }
-          });
-        }
-      }
-    });
+// Specify the parent element where you want to search
+const parentElement = $('div');
 
-    return tree;
-  };
-}
+// Iterate over child elements of the parent element
+parentElement.children().each((index, element) => {
+  const childElement = $(element);
 
-export function attributeCheck(options: any): Rule {
-  return (_tree: Tree, _context: SchematicContext) => {
-    const templateSource = apply(url('./files'), [
-      // other manipulations...
-    ]);
-    return mergeWith(templateSource);
-  };
-}
+  // Check if the element has a class attribute
+  if (childElement.attr('class')) {
+    console.log('Element has a class attribute:', childElement.text());
+  }
+});
