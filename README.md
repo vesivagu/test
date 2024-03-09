@@ -1,29 +1,20 @@
 const cheerio = require('cheerio');
+const fs = require('fs');
 
-// Sample HTML content
-const htmlContent = `
-<div>
-  <div>
-    <p class="paragraph">This is a paragraph.</p>
-  </div>
-  <div>
-    <p>This is another paragraph.</p>
-  </div>
-</div>
-`;
+// Load your HTML content
+const html = fs.readFileSync('your_html_file.html');
 
-// Load HTML content using cheerio
-const $ = cheerio.load(htmlContent);
+// Load HTML into Cheerio
+const $ = cheerio.load(html);
 
-// Specify the parent element where you want to search
-const parentElement = $('div');
+// Function to check if element has a class attribute
+function hasClassAttribute(element) {
+    return $(element).attr('class') !== undefined;
+}
 
-// Iterate over child elements of the parent element
-parentElement.children().each((index, element) => {
-  const childElement = $(element);
-
-  // Check if the element has a class attribute
-  if (childElement.attr('class')) {
-    console.log('Element has a class attribute:', childElement.text());
-  }
+// Usage example:
+$('your_selector').each((index, element) => {
+    if (hasClassAttribute(element)) {
+        console.log($(element).attr('class'));
+    }
 });
