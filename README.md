@@ -1,42 +1,40 @@
-import { Rule, SchematicContext, Tree, chain } from '@angular-devkit/schematics';
-import * as parse5 from 'parse5';
+import { Rule, SchematicContext, Tree, SchematicsException } from '@angular-devkit/schematics';
+import { parseTemplate } from '@angular/compiler';
+import { findNodes } from '@angular/compiler/src/utils';
 
-function updateHtmlClasses(): Rule {
+export function updateClasses(): Rule {
   return (tree: Tree, _context: SchematicContext) => {
-    tree.visit(filePath => {
-      if (filePath.endsWith('.html')) {
-        const content = tree.read(filePath)?.toString('utf-8');
-        if (content) {
-          const document = parse5.parse(content);
-          traverse(document);
-          const modifiedContent = parse5.serialize(document);
-          tree.overwrite(filePath, modifiedContent);
-        }
+    // Find all HTML files in the project
+    const htmlFiles = tree.actions.filter(action => action.path.endsWith('.html'));
+
+    htmlFiles.forEach(action => {
+      const htmlContent = tree.read(action.path);
+      if (!htmlContent) {
+        throw new SchematicsException(`File ${action.path} not found.`);
       }
+
+      const sourceText = htmlContent.toString('utf-8');
+      const htmlAst = parseTemplate(sourceText, action.path);
+      const elements = findNodes(htmlAst, t => t instanceof Element);
+
+      elements.forEach(element => {
+        if (element.name === 'div' && element.attrs.find(attr => attr.name === 'class' && attr.value.includes('old-class'))) {
+          // Update existing class or add new class
+          const classAttr = element.attrs.find(attr => attr.name === 'class');
+          if (classAttr) {
+            classAttr.value += ' new-class';
+          } else {
+            element.attrs.push({ name: 'class', value: 'new-class' });
+          }
+        }
+      });
+
+      const updatedHtml = htmlAst.source;
+
+      // Write back the changes to the file
+      tree.overwrite(action.path, updatedHtml);
     });
+
     return tree;
   };
-}
-
-function traverse(node: any) {
-  if (node.attrs) {
-    const classAttr = node.attrs.find((attr: any) => attr.name === 'class');
-    if (classAttr) {
-      // Update existing classes
-      // e.g., classAttr.value += ' new-class';
-    } else {
-      // Add new class
-      // e.g., node.attrs.push({ name: 'class', value: 'new-class' });
-    }
-  }
-
-  if (node.childNodes) {
-    node.childNodes.forEach((child: any) => traverse(child));
-  }
-}
-
-export function mySchematic(options: any): Rule {
-  return chain([
-    updateHtmlClasses()
-  ]);
 }
