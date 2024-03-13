@@ -1,6 +1,6 @@
 import { Rule, Tree, SchematicContext, SchematicsException, chain } from '@angular-devkit/schematics';
 import { getWorkspace } from '@schematics/angular/utility/config';
-import { parse as parseHtml, serialize } from 'parse5';
+import { parse as parseHtml, serialize, DefaultTreeDocumentFragment, DefaultTreeElement } from 'parse5';
 
 export function updateHtml(): Rule {
   return (tree: Tree, _context: SchematicContext) => {
@@ -32,7 +32,7 @@ export function updateHtml(): Rule {
       updateClassAndAddNewClass(document, existingClass, newClass);
 
       // Serialize the updated document and overwrite the file
-      const updatedContentString = serialize(document);
+      const updatedContentString = customSerialize(document);
       tree.overwrite(filePath, updatedContentString);
     });
 
@@ -61,6 +61,25 @@ function updateClassAndAddNewClass(document: any, existingClass: string, newClas
   }
 
   traverse(document);
+}
+
+function customSerialize(document: any): string {
+  function serializeNode(node: any): string {
+    if (node instanceof DefaultTreeElement) {
+      const tagName = node.tagName;
+      const attributes = node.attrs.map((attr: any) => `${attr.name}="${attr.value}"`).join(' ');
+      const startTag = `<${tagName}${attributes ? ' ' + attributes : ''}>`;
+      const innerHTML = node.childNodes.map((childNode: any) => serializeNode(childNode)).join('');
+      const endTag = `</${tagName}>`;
+      return startTag + innerHTML + endTag;
+    } else if (node instanceof DefaultTreeDocumentFragment) {
+      return node.childNodes.map((childNode: any) => serializeNode(childNode)).join('');
+    } else {
+      return node.value;
+    }
+  }
+
+  return serializeNode(document);
 }
 
 export default function(): Rule {
