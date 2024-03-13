@@ -1,40 +1,67 @@
-import { Rule, SchematicContext, Tree, SchematicsException } from '@angular-devkit/schematics';
-import { parseTemplate } from '@angular/compiler';
-import { findNodes } from '@angular/compiler/src/utils';
+import { Rule, Tree, SchematicContext, SchematicsException, apply, url, applyToUpdateRecorder, chain } from '@angular-devkit/schematics';
+import { findElementWithTagAndAttribute, findElementWithTag } from '@schematics/angular/utility/html-utils';
+import { getWorkspace } from '@schematics/angular/utility/config';
+import { parse as parseHtml } from 'parse5';
+import { strings } from '@angular-devkit/core';
 
-export function updateClasses(): Rule {
+export function updateHtml(): Rule {
   return (tree: Tree, _context: SchematicContext) => {
-    // Find all HTML files in the project
-    const htmlFiles = tree.actions.filter(action => action.path.endsWith('.html'));
+    const workspace = getWorkspace(tree);
+    const projectName = Object.keys(workspace.projects)[0];
+    const project = workspace.projects[projectName];
 
-    htmlFiles.forEach(action => {
-      const htmlContent = tree.read(action.path);
-      if (!htmlContent) {
-        throw new SchematicsException(`File ${action.path} not found.`);
+    if (project.projectType !== 'application') {
+      throw new SchematicsException(`Update requires a project type of "application".`);
+    }
+
+    const sourcePath = `${project.sourceRoot}/app`;
+    const htmlFiles = tree.getDir(sourcePath).visit((filePath) => filePath.endsWith('.html'));
+    
+    // Example classes
+    const existingClass = 'old-class';
+    const newClass = 'new-class';
+
+    htmlFiles.forEach((filePath) => {
+      const fileContent = tree.read(filePath);
+      if (!fileContent) {
+        return;
       }
 
-      const sourceText = htmlContent.toString('utf-8');
-      const htmlAst = parseTemplate(sourceText, action.path);
-      const elements = findNodes(htmlAst, t => t instanceof Element);
+      const contentString = fileContent.toString('utf-8');
+      const document = parseHtml(contentString);
 
-      elements.forEach(element => {
-        if (element.name === 'div' && element.attrs.find(attr => attr.name === 'class' && attr.value.includes('old-class'))) {
-          // Update existing class or add new class
-          const classAttr = element.attrs.find(attr => attr.name === 'class');
-          if (classAttr) {
-            classAttr.value += ' new-class';
-          } else {
-            element.attrs.push({ name: 'class', value: 'new-class' });
-          }
+      // Find elements with the existing class
+      const elementsWithExistingClass = findElementWithTagAndAttribute(document, 'div', 'class', existingClass);
+
+      // Update existing elements
+      elementsWithExistingClass.forEach((element) => {
+        const classes = element.attrs.find(attr => attr.name === 'class');
+        if (classes) {
+          classes.value += ` ${newClass}`;
         }
       });
 
-      const updatedHtml = htmlAst.source;
+      // Add new class to elements without the existing class
+      const elementsWithoutExistingClass = findElementWithTag(document, 'p');
+      elementsWithoutExistingClass.forEach((element) => {
+        const classes = element.attrs.find(attr => attr.name === 'class');
+        if (classes) {
+          classes.value += ` ${newClass}`;
+        } else {
+          element.attrs.push({ name: 'class', value: newClass });
+        }
+      });
 
-      // Write back the changes to the file
-      tree.overwrite(action.path, updatedHtml);
+      const updatedContentString = strings.serialize(document);
+      tree.overwrite(filePath, updatedContentString);
     });
 
     return tree;
   };
+}
+
+export default function(): Rule {
+  return chain([
+    updateHtml()
+  ]);
 }
