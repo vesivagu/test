@@ -1,44 +1,6 @@
 import { Rule, Tree, SchematicContext, SchematicsException, chain } from '@angular-devkit/schematics';
 import { getWorkspace } from '@schematics/angular/utility/config';
-import { parse as parseHtml, serialize } from 'parse5';
-
-// Custom tree adapter example
-const customTreeAdapter = {
-  // Implement the required methods and properties of the tree adapter
-  // For simplicity, we'll only include the serialize method
-  createDocument() {
-    return { nodeName: '#document', childNodes: [] };
-  },
-  // Add other methods and properties as needed
-  // ...
-  serialize(node) {
-    // Custom serialization logic here
-    // Example: serialize the node without formatting attributes
-    return serializeNode(node);
-  }
-};
-
-// Serialize node without formatting attributes
-function serializeNode(node) {
-  if (node.nodeName === '#text') {
-    return node.value;
-  } else {
-    let str = `<${node.nodeName}`;
-    if (node.attrs) {
-      node.attrs.forEach(attr => {
-        str += ` ${attr.name}="${attr.value}"`;
-      });
-    }
-    str += '>';
-    if (node.childNodes) {
-      node.childNodes.forEach(childNode => {
-        str += serializeNode(childNode);
-      });
-    }
-    str += `</${node.nodeName}>`;
-    return str;
-  }
-}
+import { parse as parseHtml } from 'parse5';
 
 export function updateHtml(): Rule {
   return (tree: Tree, _context: SchematicContext) => {
@@ -64,13 +26,13 @@ export function updateHtml(): Rule {
       }
 
       let contentString = fileContent.toString('utf-8');
-      const document = parseHtml(contentString, { treeAdapter: customTreeAdapter });
+      const document = parseHtml(contentString);
 
       // Update existing class and add new class
       updateClassAndAddNewClass(document, existingClass, newClass);
 
-      // Serialize the updated document and overwrite the file
-      const updatedContentString = serialize(document);
+      // Serialize the updated document with custom serializer and overwrite the file
+      const updatedContentString = customSerialize(document);
       tree.overwrite(filePath, updatedContentString);
     });
 
@@ -79,7 +41,53 @@ export function updateHtml(): Rule {
 }
 
 function updateClassAndAddNewClass(document: any, existingClass: string, newClass: string) {
-  // Implementation remains the same
+  function traverse(node: any) {
+    if (node.attrs) {
+      const classAttr = node.attrs.find((attr: any) => attr.name === 'class');
+      if (classAttr && classAttr.value.includes(existingClass)) {
+        // Update existing class
+        classAttr.value = classAttr.value.replace(existingClass, newClass);
+      } else if (!classAttr) {
+        // Add new class if class attribute doesn't exist
+        node.attrs.push({ name: 'class', value: newClass });
+      }
+    }
+
+    if (node.childNodes) {
+      node.childNodes.forEach((childNode: any) => {
+        traverse(childNode);
+      });
+    }
+  }
+
+  traverse(document);
+}
+
+function customSerialize(document: any): string {
+  function serializeNode(node: any): string {
+    if (node.nodeName === '#text') {
+      return node.value;
+    }
+    
+    let output = `<${node.tagName}`;
+    if (node.attrs) {
+      node.attrs.forEach((attr: any) => {
+        output += ` ${attr.name}="${attr.value}"`;
+      });
+    }
+    output += '>';
+
+    if (node.childNodes) {
+      node.childNodes.forEach((childNode: any) => {
+        output += serializeNode(childNode);
+      });
+    }
+
+    output += `</${node.tagName}>`;
+    return output;
+  }
+
+  return serializeNode(document);
 }
 
 export default function(): Rule {
