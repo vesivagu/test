@@ -1,8 +1,6 @@
-import { Rule, Tree, SchematicContext, SchematicsException, apply, url, applyToUpdateRecorder, chain } from '@angular-devkit/schematics';
-import { findElementWithTagAndAttribute, findElementWithTag } from '@schematics/angular/utility/html-utils';
+import { Rule, Tree, SchematicContext, SchematicsException, chain } from '@angular-devkit/schematics';
 import { getWorkspace } from '@schematics/angular/utility/config';
-import { parse as parseHtml } from 'parse5';
-import { strings } from '@angular-devkit/core';
+import { parse as parseHtml, serialize } from 'parse5';
 
 export function updateHtml(): Rule {
   return (tree: Tree, _context: SchematicContext) => {
@@ -27,37 +25,42 @@ export function updateHtml(): Rule {
         return;
       }
 
-      const contentString = fileContent.toString('utf-8');
+      let contentString = fileContent.toString('utf-8');
       const document = parseHtml(contentString);
 
-      // Find elements with the existing class
-      const elementsWithExistingClass = findElementWithTagAndAttribute(document, 'div', 'class', existingClass);
+      // Update existing class and add new class
+      updateClassAndAddNewClass(document, existingClass, newClass);
 
-      // Update existing elements
-      elementsWithExistingClass.forEach((element) => {
-        const classes = element.attrs.find(attr => attr.name === 'class');
-        if (classes) {
-          classes.value += ` ${newClass}`;
-        }
-      });
-
-      // Add new class to elements without the existing class
-      const elementsWithoutExistingClass = findElementWithTag(document, 'p');
-      elementsWithoutExistingClass.forEach((element) => {
-        const classes = element.attrs.find(attr => attr.name === 'class');
-        if (classes) {
-          classes.value += ` ${newClass}`;
-        } else {
-          element.attrs.push({ name: 'class', value: newClass });
-        }
-      });
-
-      const updatedContentString = strings.serialize(document);
+      // Serialize the updated document and overwrite the file
+      const updatedContentString = serialize(document);
       tree.overwrite(filePath, updatedContentString);
     });
 
     return tree;
   };
+}
+
+function updateClassAndAddNewClass(document: any, existingClass: string, newClass: string) {
+  function traverse(node: any) {
+    if (node.attrs) {
+      const classAttr = node.attrs.find((attr: any) => attr.name === 'class');
+      if (classAttr && classAttr.value.includes(existingClass)) {
+        // Update existing class
+        classAttr.value = classAttr.value.replace(existingClass, newClass);
+      } else if (!classAttr) {
+        // Add new class if class attribute doesn't exist
+        node.attrs.push({ name: 'class', value: newClass });
+      }
+    }
+
+    if (node.childNodes) {
+      node.childNodes.forEach((childNode: any) => {
+        traverse(childNode);
+      });
+    }
+  }
+
+  traverse(document);
 }
 
 export default function(): Rule {
