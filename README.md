@@ -1,3 +1,19 @@
+
+[user01@server-1 openshift-april-2024]$ cat ~/openshift.txt
+Red Hat OpenShift API Server Endpoint
++++++++++++++++++++++++++++++++++++++ 
+https://api.ocp4.rpsconsulting.in:6443
+
+Red Hat OpenShift web-console
++++++++++++++++++++++++++++++
+https://console-openshift-console.apps.ocp4.rpsconsulting.in 
+
+Login Credentials
++++++++++++++++++
+user    : kubeadmin
+password: mBMD4-fRIZo-BwPfQ-7quh7
+
+
 ```
 https://venkateshsivaguru.jfrog.io/artifactory/api/docker/venkatesh-docker
 
@@ -32,9 +48,8 @@ oc create secret docker-registry private-jfrog-image-registry --docker-server=ve
 
 oc apply -f hello-microservice-deploy.yml
 
-oc new-app --image=venkateshsivaguru.jfrog.io/venkatesh-docker/hello-microservice:1.0
+# oc new-app --image=venkateshsivaguru.jfrog.io/venkatesh-docker/hello-microservice:1.0
 
-oc get po
 
 
 ```
