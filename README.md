@@ -1,97 +1,24 @@
-import { Rule, Tree, SchematicContext, SchematicsException, chain } from '@angular-devkit/schematics';
-import { getWorkspace } from '@schematics/angular/utility/config';
-import { parse as parseHtml } from 'parse5';
+```
+https://venkateshsivaguru.jfrog.io/artifactory/api/docker/venkatesh-docker
 
-export function updateHtml(): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
-    const workspace = getWorkspace(tree);
-    const projectName = Object.keys(workspace.projects)[0];
-    const project = workspace.projects[projectName];
+to login to jfrog art:
+docker login -uvenkatesh89susila@gmail.com venkateshsivaguru.jfrog.io
 
-    if (project.projectType !== 'application') {
-      throw new SchematicsException(`Update requires a project type of "application".`);
-    }
+password:
+cmVmdGtuOjAxOjE3NDQ5NTYxNzg6Y1VwdmFyNGNrcDBaWFliZmN2MzQxVW9EMmtp
 
-    const sourcePath = `${project.sourceRoot}/app`;
-    const htmlFiles = tree.getDir(sourcePath).visit((filePath) => filePath.endsWith('.html'));
-    
-    // Example classes
-    const existingClass = 'old-class';
-    const newClass = 'new-class';
+docker pull venkateshsivaguru.jfrog.io/venkatesh-docker/hello-world:latest
 
-    htmlFiles.forEach((filePath) => {
-      const fileContent = tree.read(filePath);
-      if (!fileContent) {
-        return;
-      }
 
-      let contentString = fileContent.toString('utf-8');
-      const document = parseHtml(contentString);
+docker tag venkateshsivaguru.jfrog.io/venkatesh-docker/hello-world venkateshsivaguru.jfrog.io/venkatesh-docker/hello-world:1.0.0
 
-      // Update existing class and add new class
-      updateClassAndAddNewClass(document, existingClass, newClass);
 
-      // Serialize the updated document with custom serializer and overwrite the file
-      const updatedContentString = customSerialize(document);
-      tree.overwrite(filePath, updatedContentString);
-    });
+docker push venkateshsivaguru.jfrog.io/venkatesh-docker/hello-world:1.0.0
 
-    return tree;
-  };
-}
+docker tag tektutor/hello-microservice:1.0 venkateshsivaguru.jfrog.io/venkatesh-docker/hello-microservice:1.0.0
 
-function updateClassAndAddNewClass(document: any, existingClass: string, newClass: string) {
-  function traverse(node: any) {
-    if (node.attrs) {
-      const classAttr = node.attrs.find((attr: any) => attr.name === 'class');
-      if (classAttr && classAttr.value.includes(existingClass)) {
-        // Update existing class
-        classAttr.value = classAttr.value.replace(existingClass, newClass);
-      } else if (!classAttr) {
-        // Add new class if class attribute doesn't exist
-        node.attrs.push({ name: 'class', value: newClass });
-      }
-    }
 
-    if (node.childNodes) {
-      node.childNodes.forEach((childNode: any) => {
-        traverse(childNode);
-      });
-    }
-  }
 
-  traverse(document);
-}
+docker push venkateshsivaguru.jfrog.io/venkatesh-docker/hello-microservice:1.0.0
 
-function customSerialize(document: any): string {
-  function serializeNode(node: any): string {
-    if (node.nodeName === '#text') {
-      return node.value;
-    }
-    
-    let output = `<${node.tagName}`;
-    if (node.attrs) {
-      node.attrs.forEach((attr: any) => {
-        output += ` ${attr.name}="${attr.value}"`;
-      });
-    }
-    output += '>';
-
-    if (node.childNodes) {
-      node.childNodes.forEach((childNode: any) => {
-        output += serializeNode(childNode);
-      });
-    }
-
-    output += `</${node.tagName}>`;
-    return output;
-  }
-
-  return serializeNode(document);
-}
-
-export default function(): Rule {
-  return chain([
-    updateHtml()
-  ]);
-}
+```
