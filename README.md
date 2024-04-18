@@ -37,6 +37,8 @@ docker push venkateshsivaguru.jfrog.io/venkatesh-docker/hello-world:1.0.0
 
 -------------below are sample hello microservice-----------------
 
+-- https://venkateshsivaguru.jfrog.io/ui/login/
+
 -- jrog enterprise - private openshift image registry
 
 docker build -t tektutor/hello-microservice:1.0 .
