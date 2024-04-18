@@ -1,4 +1,9 @@
 
+
+
+
+```
+
 [user01@server-1 openshift-april-2024]$ cat ~/openshift.txt
 Red Hat OpenShift API Server Endpoint
 +++++++++++++++++++++++++++++++++++++ 
@@ -12,9 +17,8 @@ Login Credentials
 +++++++++++++++++
 user    : kubeadmin
 password: mBMD4-fRIZo-BwPfQ-7quh7
+-----------------------------
 
-
-```
 https://venkateshsivaguru.jfrog.io/artifactory/api/docker/venkatesh-docker
 
 to login to jfrog art:
