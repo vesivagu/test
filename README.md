@@ -1,61 +1,21 @@
+To generate JSON based on a custom JSON schema using npm, you can use libraries like `json-schema-faker` or `faker.js` along with `json-schema` for schema validation. First, install the required packages:
 
-
-
-
+```bash
+npm install json-schema-faker faker json-schema
 ```
 
-[user01@server-1 openshift-april-2024]$ cat ~/openshift.txt
-Red Hat OpenShift API Server Endpoint
-+++++++++++++++++++++++++++++++++++++ 
-https://api.ocp4.rpsconsulting.in:6443
+Then, you can use them in your code like this:
 
-Red Hat OpenShift web-console
-+++++++++++++++++++++++++++++
-https://console-openshift-console.apps.ocp4.rpsconsulting.in 
+```javascript
+const jsf = require('json-schema-faker');
+const faker = require('faker');
+const schema = require('./your-custom-schema.json'); // Import your custom JSON schema
 
-Login Credentials
-+++++++++++++++++
-user    : kubeadmin
-password: mBMD4-fRIZo-BwPfQ-7quh7
------------------------------
+jsf.extend('faker', () => faker);
 
-https://venkateshsivaguru.jfrog.io/artifactory/api/docker/venkatesh-docker
-
-to login to jfrog art:
-docker login -uvenkatesh89susila@gmail.com venkateshsivaguru.jfrog.io
-
-password:
-cmVmdGtuOjAxOjE3NDQ5NTYxNzg6Y1VwdmFyNGNrcDBaWFliZmN2MzQxVW9EMmtp
-
-docker pull venkateshsivaguru.jfrog.io/venkatesh-docker/hello-world:latest
-
-
-docker tag venkateshsivaguru.jfrog.io/venkatesh-docker/hello-world venkateshsivaguru.jfrog.io/venkatesh-docker/hello-world:1.0.0
-
-
-docker push venkateshsivaguru.jfrog.io/venkatesh-docker/hello-world:1.0.0
-
--------------below are sample hello microservice-----------------
-
--- https://venkateshsivaguru.jfrog.io/ui/login/
-
--- jrog enterprise - private openshift image registry
-
-docker build -t tektutor/hello-microservice:1.0 .
-
-docker tag tektutor/hello-microservice:1.0 venkateshsivaguru.jfrog.io/venkatesh-docker/hello-microservice:1.0.0
-
-docker push venkateshsivaguru.jfrog.io/venkatesh-docker/hello-microservice:1.0.0
-
---update below in hello-microservice.deploy.yml
-venkateshsivaguru.jfrog.io/venkatesh-docker/hello-microservice:1.0.0
-
-oc create secret docker-registry private-jfrog-image-registry --docker-server=venkateshsivaguru.jfrog.io --docker-username=venkatesh89susila@gmail.com --docker-password=cmVmdGtuOjAxOjE3NDQ5NTYxNzg6Y1VwdmFyNGNrcDBaWFliZmN2MzQxVW9EMmtp
-
-oc apply -f hello-microservice-deploy.yml
-
-# oc new-app --image=venkateshsivaguru.jfrog.io/venkatesh-docker/hello-microservice:1.0
-
-
-
+jsf.resolve(schema).then(sample => {
+  console.log(JSON.stringify(sample, null, 2));
+});
 ```
+
+Replace `'./your-custom-schema.json'` with the path to your custom JSON schema file. This code will generate a JSON object based on your schema using fake data provided by `faker.js`.
