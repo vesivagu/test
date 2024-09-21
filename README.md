@@ -1,21 +1,32 @@
-To generate JSON based on a custom JSON schema using npm, you can use libraries like `json-schema-faker` or `faker.js` along with `json-schema` for schema validation. First, install the required packages:
+const fs = require('fs');
+const angularJsonPath = './angular.json';
 
-```bash
-npm install json-schema-faker faker json-schema
-```
+// Load the angular.json file
+let angularJson = require(angularJsonPath);
 
-Then, you can use them in your code like this:
+// Define the script you want to add
+const newScript = "src/assets/js/new-script.js";
 
-```javascript
-const jsf = require('json-schema-faker');
-const faker = require('faker');
-const schema = require('./your-custom-schema.json'); // Import your custom JSON schema
+// Loop through each project in the angular.json
+Object.keys(angularJson.projects).forEach(projectName => {
+  const project = angularJson.projects[projectName];
 
-jsf.extend('faker', () => faker);
+  // Check if architect.build.options.scripts exists, if not, initialize it
+  if (project.architect && project.architect.build && project.architect.build.options) {
+    const buildOptions = project.architect.build.options;
+    
+    if (!buildOptions.scripts) {
+      buildOptions.scripts = [];
+    }
 
-jsf.resolve(schema).then(sample => {
-  console.log(JSON.stringify(sample, null, 2));
+    // Add the new script if it doesn't already exist
+    if (!buildOptions.scripts.includes(newScript)) {
+      buildOptions.scripts.push(newScript);
+    }
+  }
 });
-```
 
-Replace `'./your-custom-schema.json'` with the path to your custom JSON schema file. This code will generate a JSON object based on your schema using fake data provided by `faker.js`.
+// Save the modified angular.json back to the file
+fs.writeFileSync(angularJsonPath, JSON.stringify(angularJson, null, 2), 'utf8');
+
+console.log('Scripts updated in angular.json');
