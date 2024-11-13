@@ -1,32 +1,58 @@
-const fs = require('fs');
-const angularJsonPath = './angular.json';
+import { Injectable } from '@angular/core';
 
-// Load the angular.json file
-let angularJson = require(angularJsonPath);
+@Injectable({
+  providedIn: 'root',
+})
+export class HostBindingService {
+  private activeClass = false;
+  private color = 'black';
 
-// Define the script you want to add
-const newScript = "src/assets/js/new-script.js";
-
-// Loop through each project in the angular.json
-Object.keys(angularJson.projects).forEach(projectName => {
-  const project = angularJson.projects[projectName];
-
-  // Check if architect.build.options.scripts exists, if not, initialize it
-  if (project.architect && project.architect.build && project.architect.build.options) {
-    const buildOptions = project.architect.build.options;
-    
-    if (!buildOptions.scripts) {
-      buildOptions.scripts = [];
-    }
-
-    // Add the new script if it doesn't already exist
-    if (!buildOptions.scripts.includes(newScript)) {
-      buildOptions.scripts.push(newScript);
-    }
+  // Methods to get and set class
+  setActiveClass(isActive: boolean) {
+    this.activeClass = isActive;
   }
-});
 
-// Save the modified angular.json back to the file
-fs.writeFileSync(angularJsonPath, JSON.stringify(angularJson, null, 2), 'utf8');
+  getActiveClass() {
+    return this.activeClass;
+  }
 
-console.log('Scripts updated in angular.json');
+  // Methods to get and set color
+  setColor(color: string) {
+    this.color = color;
+  }
+
+  getColor() {
+    return this.color;
+  }
+}
+
+
+
+
+
+
+import { Component, HostBinding, OnInit } from '@angular/core';
+import { HostBindingService } from './host-binding.service';
+
+@Component({
+  selector: 'app-example',
+  template: `<p>Example component</p>`
+})
+export class ExampleComponent implements OnInit {
+  @HostBinding('class.active') isActive!: boolean;
+  @HostBinding('style.color') hostColor!: string;
+
+  constructor(private hostBindingService: HostBindingService) {}
+
+  ngOnInit(): void {
+    // Initialize host properties based on service values
+    this.isActive = this.hostBindingService.getActiveClass();
+    this.hostColor = this.hostBindingService.getColor();
+
+    // You could also add logic here to watch the service for changes, if needed.
+  }
+}
+
+
+
+
