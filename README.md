@@ -1,58 +1,33 @@
-import { Injectable } from '@angular/core';
+import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class HostBindingService {
-  private activeClass = false;
-  private color = 'black';
+export function addProvider(): Rule {
+  return (tree: Tree, _context: SchematicContext) => {
+    const filePath = 'src/app/app.module.ts';
 
-  // Methods to get and set class
-  setActiveClass(isActive: boolean) {
-    this.activeClass = isActive;
-  }
+    // Check if app.module.ts exists
+    if (!tree.exists(filePath)) {
+      throw new Error(`${filePath} not found!`);
+    }
 
-  getActiveClass() {
-    return this.activeClass;
-  }
+    // Read the file content
+    const fileContent = tree.read(filePath)?.toString('utf-8');
+    if (!fileContent) {
+      throw new Error(`Failed to read ${filePath}`);
+    }
 
-  // Methods to get and set color
-  setColor(color: string) {
-    this.color = color;
-  }
+    // Add the provider
+    const updatedContent = fileContent.replace(
+      /providers:\s*\[\s*([^\]]*)\]/,
+      (match, providers) => {
+        // Ensure there's a comma if the providers list is not empty
+        const prefix = providers.trim() ? `${providers.trim()}, ` : '';
+        return `providers: [${prefix}MyNewService]`;
+      }
+    );
 
-  getColor() {
-    return this.color;
-  }
+    // Write the updated content back to the file
+    tree.overwrite(filePath, updatedContent);
+
+    return tree;
+  };
 }
-
-
-
-
-
-
-import { Component, HostBinding, OnInit } from '@angular/core';
-import { HostBindingService } from './host-binding.service';
-
-@Component({
-  selector: 'app-example',
-  template: `<p>Example component</p>`
-})
-export class ExampleComponent implements OnInit {
-  @HostBinding('class.active') isActive!: boolean;
-  @HostBinding('style.color') hostColor!: string;
-
-  constructor(private hostBindingService: HostBindingService) {}
-
-  ngOnInit(): void {
-    // Initialize host properties based on service values
-    this.isActive = this.hostBindingService.getActiveClass();
-    this.hostColor = this.hostBindingService.getColor();
-
-    // You could also add logic here to watch the service for changes, if needed.
-  }
-}
-
-
-
-
