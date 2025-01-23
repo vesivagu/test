@@ -1,33 +1,30 @@
-import { Rule, SchematicContext, Tree } from '@angular-devkit/schematics';
-
-export function addProvider(): Rule {
-  return (tree: Tree, _context: SchematicContext) => {
-    const filePath = 'src/app/app.module.ts';
-
-    // Check if app.module.ts exists
-    if (!tree.exists(filePath)) {
-      throw new Error(`${filePath} not found!`);
-    }
-
-    // Read the file content
-    const fileContent = tree.read(filePath)?.toString('utf-8');
-    if (!fileContent) {
-      throw new Error(`Failed to read ${filePath}`);
-    }
-
-    // Add the provider
-    const updatedContent = fileContent.replace(
-      /providers:\s*\[\s*([^\]]*)\]/,
-      (match, providers) => {
-        // Ensure there's a comma if the providers list is not empty
-        const prefix = providers.trim() ? `${providers.trim()}, ` : '';
-        return `providers: [${prefix}MyNewService]`;
-      }
-    );
-
-    // Write the updated content back to the file
-    tree.overwrite(filePath, updatedContent);
-
-    return tree;
-  };
+function buildTmplFn(templateString) {
+    // Parse the template string and replace expressions like ${variable}
+    return function (data) {
+        return templateString.replace(/\$\{([\w\.]+)\}/g, function (match, key) {
+            // Traverse object properties (e.g., `data.user.name`)
+            var keys = key.split('.');
+            var value = data;
+            for (var i = 0; i < keys.length; i++) {
+                if (value[keys[i]] !== undefined) {
+                    value = value[keys[i]];
+                } else {
+                    return ''; // If a key is missing, return an empty string
+                }
+            }
+            return value;
+        });
+    };
 }
+
+// Example usage
+var templateString = '<h1>${title}</h1><p>${description}</p>';
+var compiled = buildTmplFn(templateString);
+
+var data = {
+    title: "Hello, World!",
+    description: "This is a safer template example."
+};
+
+console.log(compiled(data));
+// Output: <h1>Hello, World!</h1><p>This is a safer template example.</p>
