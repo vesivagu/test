@@ -1,16 +1,13 @@
-function buildTemplate(templateString) {
-    return function(data) {
-        return templateString.replace(/\$\{([\w\.]+)\}/g, function(match, key) {
-            var keys = key.split('.');
-            var value = data;
-            for (var i = 0; i < keys.length; i++) {
-                if (value[keys[i]] !== undefined) {
-                    value = value[keys[i]];
-                } else {
-                    return ''; // Handle missing keys
-                }
-            }
-            return value;
-        });
-    };
-}
+var source = $("#template").html();
+var template = Handlebars.compile(source);
+var data = { title: "Hello", description: "World" };
+var html = template(data);
+$("#output").html(html);
+
+
+
+<script id="template" type="text/x-handlebars-template">
+    <h1>{{title}}</h1>
+    <p>{{description}}</p>
+</script>
+<div id="output"></div>
