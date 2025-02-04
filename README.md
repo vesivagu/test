@@ -2,39 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mustache.js Example</title>
-    <!-- Include Mustache.js CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script>
+    <title>Mustache.js with jQuery Example</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mustache@4.2.0/mustache.min.js"></script>
 </head>
 <body>
-
-    <!-- The template with Mustache syntax -->
-    <script id="template" type="x-tmpl-mustache">
-        <div>
-            <h1>{{title}}</h1>
-            <p>{{description}}</p>
-        </div>
+    <h1>User List</h1>
+    
+    <!-- Mustache Template -->
+    <script id="user-template" type="x-tmpl-mustache">
+        <ul>
+            {{#users}}
+                <li>{{name}} - {{email}}</li>
+            {{/users}}
+        </ul>
     </script>
 
-    <div id="content"></div>
+    <!-- Container to render the template -->
+    <div id="user-list"></div>
 
     <script>
-        // The data to be injected into the template
-        const data = {
-            title: "Welcome to Mustache.js",
-            description: "This is an example of using Mustache.js with a CDN."
-        };
+        $(document).ready(function () {
+            // Sample data
+            var data = {
+                users: [
+                    { name: "Alice", email: "alice@example.com" },
+                    { name: "Bob", email: "bob@example.com" },
+                    { name: "Charlie", email: "charlie@example.com" }
+                ]
+            };
 
-        // Get the template from the DOM
-        const template = document.getElementById('template').innerHTML;
+            // Get the template from the script tag
+            var template = $('#user-template').html();
 
-        // Render the template with data
-        const rendered = Mustache.render(template, data);
+            // Render the data using Mustache
+            var rendered = Mustache.render(template, data);
 
-        // Inject the rendered HTML into the page
-        document.getElementById('content').innerHTML = rendered;
+            // Insert the rendered HTML into the DOM
+            $('#user-list').html(rendered);
+        });
     </script>
-
 </body>
 </html>
