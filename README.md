@@ -3,57 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Underscore.js Complex Template Example</title>
-  <!-- Include jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Include Underscore.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.1/underscore-min.js"></script>
+  <title>Nunjucks.js with jQuery Example</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/nunjucks/3.2.3/nunjucks.min.js"></script>
 </head>
 <body>
-
-<div id="output"></div>
-
-<!-- Underscore Template -->
-<script type="text/template" id="template">
-  <h2><%= title %></h2>
-  
-  <!-- Check if there are items -->
-  <% if (items.length > 0) { %>
+  <!-- Template -->
+  <script id="template" type="text/nunjucks">
+    <h1>{{ title }}</h1>
+    <p>{{ message }}</p>
+    
     <ul>
-      <% _.each(items, function(item) { %>
-        <li><%= item.name %> - <%= item.price %></li>
-      <% }); %>
+      {% for user in users %}
+        <li>{{ user.name }} - {{ user.age }} years old</li>
+      {% else %}
+        <li>No users available</li>
+      {% endfor %}
     </ul>
-  <% } else { %>
-    <p>No items available</p>
-  <% } %>
-</script>
 
-<script>
-  $(document).ready(function() {
-    // Sample data for rendering the template
-    const data = {
-      title: 'Product List',
-      items: [
-        { name: 'Product 1', price: '$10' },
-        { name: 'Product 2', price: '$15' },
-        { name: 'Product 3', price: '$20' }
-      ]
-    };
+    {% if showSpecialMessage %}
+      <div class="special-message">This is a special message!</div>
+    {% endif %}
+  </script>
 
-    // Get the HTML of the template
-    const templateSource = $('#template').html();
+  <!-- Container to render the content -->
+  <div id="content"></div>
 
-    // Compile the template using Underscore.js
-    const compiledTemplate = _.template(templateSource);
+  <script>
+    $(document).ready(function () {
+      // Example data to pass to the template
+      var data = {
+        title: "Nunjucks.js Example",
+        message: "This is a complex Nunjucks template with logic.",
+        users: [
+          { name: "John Doe", age: 28 },
+          { name: "Jane Smith", age: 34 },
+          { name: "Sara Lee", age: 22 }
+        ],
+        showSpecialMessage: true // You can toggle this to false to hide the special message
+      };
 
-    // Render the template with the provided data
-    const renderedHtml = compiledTemplate(data);
+      // Configure Nunjucks to use the DOM for templates
+      nunjucks.configure({ autoescape: true });
 
-    // Inject the rendered HTML into the DOM
-    $('#output').html(renderedHtml);
-  });
-</script>
+      // Get the template
+      var template = $('#template').html();
 
+      // Render the template with the data
+      var rendered = nunjucks.renderString(template, data);
+
+      // Inject the rendered content into the #content div
+      $('#content').html(rendered);
+    });
+  </script>
 </body>
 </html>
