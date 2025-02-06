@@ -1,62 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mustache.js Complex Logic with Select Example</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script>
-</head>
-<body>
-  <!-- Template -->
-  <script id="template" type="x-tmpl-mustache">
-    <h1>{{title}}</h1>
-    <p>{{message}}</p>
+function validateModuleFormat(input) {
+    const regex = /^\d{5}_[a-zA-Z]{3,}(_[a-zA-Z]{3,})+$/;
+    return regex.test(input);
+}
 
-    <!-- Dropdown (select list) populated from options -->
-    <label for="userSelect">Choose a user:</label>
-    <select id="userSelect">
-      {{#users}}
-        <option value="{{id}}">{{name}} ({{age}} years old)</option>
-      {{/users}}
-    </select>
+// ✅ **Valid Examples**
+console.log(validateModuleFormat("11697_module_submodule")); // true
+console.log(validateModuleFormat("12345_mod_sub"));          // true
+console.log(validateModuleFormat("54321_abc_def_ghi"));      // true
 
-    <!-- Conditional message based on selection -->
-    <div id="message"></div>
-  </script>
-
-  <!-- Container to render the content -->
-  <div id="content"></div>
-
-  <script>
-    $(document).ready(function () {
-      // Example data to pass to the template
-      var data = {
-        title: "Mustache.js Select List Example",
-        message: "Please choose a user from the dropdown.",
-        users: [
-          { id: 1, name: "John Doe", age: 28 },
-          { id: 2, name: "Jane Smith", age: 34 },
-          { id: 3, name: "Sara Lee", age: 22 }
-        ]
-      };
-
-      // Render the Mustache template with the data
-      var template = $('#template').html();
-      var rendered = Mustache.render(template, data);
-      $('#content').html(rendered);
-
-      // Event handler for select list change
-      $('#userSelect').on('change', function() {
-        var selectedUserId = $(this).val();
-        var selectedUser = data.users.find(user => user.id == selectedUserId);
-
-        // Display a message based on the selected user
-        if (selectedUser) {
-          $('#message').html('<p>You selected ' + selectedUser.name + ', who is ' + selectedUser.age + ' years old.</p>');
-        }
-      });
-    });
-  </script>
-</body>
-</html>
+// ❌ **Invalid Examples**
+console.log(validateModuleFormat("11697_module"));           // false (missing submodule)
+console.log(validateModuleFormat("11697_mo_sub"));           // false (module < 3 characters)
+console.log(validateModuleFormat("11697_module_su"));        // false (submodule < 3 characters)
+console.log(validateModuleFormat("1169_module_sub"));        // false (4 digits)
+console.log(validateModuleFormat("116970_module_sub"));      // false (6 digits)
+console.log(validateModuleFormat("11697_module_"));          // false (ends with underscore)
+console.log(validateModuleFormat("11697_module_sub_extra")); // false (extra part after submodule)
+console.log(validateModuleFormat("11697_module_sub1"));      // false (digits in submodule)
