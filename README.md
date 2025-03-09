@@ -1,35 +1,37 @@
-const fs = require('fs');
-const path = require('path');
+import * as CryptoJS from "crypto-js";
 
-// Path to the Angular package.json file
-const packageJsonPath = path.join(__dirname, 'package.json');
+async function cryptoSubtleDigest(algorithm: string, data: Uint8Array): Promise<ArrayBuffer> {
+  if (window.crypto?.subtle) {
+    return window.crypto.subtle.digest(algorithm, data);
+  }
 
-// Read the package.json file
-fs.readFile(packageJsonPath, 'utf8', (err, data) => {
-    if (err) {
-        console.error('Error reading package.json:', err);
-        return;
-    }
+  // Fallback for Safari using CryptoJS
+  let hash: CryptoJS.lib.WordArray;
+  switch (algorithm.toLowerCase()) {
+    case "sha-256":
+      hash = CryptoJS.SHA256(CryptoJS.lib.WordArray.create(data));
+      break;
+    case "sha-1":
+      hash = CryptoJS.SHA1(CryptoJS.lib.WordArray.create(data));
+      break;
+    case "sha-512":
+      hash = CryptoJS.SHA512(CryptoJS.lib.WordArray.create(data));
+      break;
+    default:
+      throw new Error(`Unsupported hash algorithm: ${algorithm}`);
+  }
 
-    try {
-        // Parse JSON data
-        let packageJson = JSON.parse(data);
+  return new Uint8Array(hash.words.flatMap(word => [
+    (word >> 24) & 0xff,
+    (word >> 16) & 0xff,
+    (word >> 8) & 0xff,
+    word & 0xff
+  ])).buffer;
+}
 
-        // Update the project name
-        packageJson.name = 'new-project-name'; // Change to the desired name
-
-        // Convert JSON back to a string
-        const updatedData = JSON.stringify(packageJson, null, 2);
-
-        // Write the updated JSON back to package.json
-        fs.writeFile(packageJsonPath, updatedData, 'utf8', (err) => {
-            if (err) {
-                console.error('Error writing package.json:', err);
-            } else {
-                console.log('Project name updated successfully!');
-            }
-        });
-    } catch (error) {
-        console.error('Error parsing package.json:', error);
-    }
-});
+// Override window.crypto.subtle.digest if it's missing
+if (!window.crypto?.subtle?.digest) {
+  (window.crypto as any).subtle = {
+    digest: cryptoSubtleDigest
+  };
+}
