@@ -19,9 +19,9 @@ spec:
           args:
             - |
               npm install -g @your-scope/your-mock-server && \
-              your-mock-server --port 3000
+              your-mock-server --port 7878
           ports:
-            - containerPort: 3000
+            - containerPort: 7878
           volumeMounts:
             - name: npmrc-volume
               mountPath: /root/.npmrc
@@ -41,7 +41,7 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 3000
+      targetPort: 7878
 ---
 apiVersion: route.openshift.io/v1
 kind: Route
