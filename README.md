@@ -1,38 +1,57 @@
-const express = require('express');
-const path = require('path');
-const fs = require('fs');
-
-const app = express();
-const PORT = process.env.PORT || 8080;
-
-// Enable JSON body parsing
-app.use(express.json());
-
-// Load mock API definitions
-const mockData = require('./mock-data.json');
-
-// Register mock routes
-for (const [route, methods] of Object.entries(mockData)) {
-  for (const [method, { request, response }] of Object.entries(methods)) {
-    app[method.toLowerCase()](route, (req, res) => {
-      if (request && JSON.stringify(req.body) !== JSON.stringify(request)) {
-        return res.status(400).json({ error: 'Invalid request body' });
-      }
-      res.json(response);
-    });
-  }
-}
-
-// Serve Angular static files
-const angularDistPath = path.join(__dirname, 'dist/your-angular-app-name');
-app.use(express.static(angularDistPath));
-
-// Redirect all other routes to Angular index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(angularDistPath, 'index.html'));
-});
-
-// Start server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`App + Mock API running on http://0.0.0.0:${PORT}`);
-});
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mock-server
+  template:
+    metadata:
+      labels:
+        app: mock-server
+    spec:
+      containers:
+        - name: mock-server
+          image: node:18-alpine
+          command: ["sh", "-c"]
+          args:
+            - |
+              npm install -g @your-scope/your-mock-server && \
+              your-mock-server --port 3000
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: npmrc-volume
+              mountPath: /root/.npmrc
+              subPath: .npmrc
+      volumes:
+        - name: npmrc-volume
+          configMap:
+            name: mock-npmrc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mock-server
+spec:
+  selector:
+    app: mock-server
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: mock-server
+spec:
+  to:
+    kind: Service
+    name: mock-server
+  port:
+    targetPort: 80
+  tls:
+    termination: edge
